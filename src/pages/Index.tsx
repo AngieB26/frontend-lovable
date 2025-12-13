@@ -44,25 +44,41 @@ const Index = () => {
     setIsEditorOpen(true);
   };
 
-  const handleSaveNote = (title: string, content: string, category: string) => {
-    addNote(title, content, category);
-    toast.success("Nota creada correctamente");
+  const handleSaveNote = async (title: string, content: string, category: string) => {
+    try {
+      await addNote(title, content, category);
+      toast.success("Nota creada correctamente");
+    } catch (e: any) {
+      toast.error(e?.message || "Error al crear nota");
+    }
   };
 
-  const handleUpdateNote = (id: string, updates: Partial<Note>) => {
-    updateNote(id, updates);
-    toast.success("Nota actualizada");
+  const handleUpdateNote = async (id: string, updates: Partial<Note>) => {
+    try {
+      await updateNote(id, updates);
+      toast.success("Nota actualizada");
+    } catch (e: any) {
+      toast.error(e?.message || "Error al actualizar nota");
+    }
   };
 
-  const handleDeleteNote = (id: string) => {
-    deleteNote(id);
-    toast.success("Nota eliminada");
+  const handleDeleteNote = async (id: string) => {
+    try {
+      await deleteNote(id);
+      toast.success("Nota eliminada");
+    } catch (e: any) {
+      toast.error(e?.message || "Error al eliminar nota");
+    }
   };
 
-  const handleTogglePin = (id: string) => {
-    togglePin(id);
-    const note = notes.find((n) => n.id === id);
-    toast.success(note?.isPinned ? "Nota desanclada" : "Nota anclada");
+  const handleTogglePin = async (id: string) => {
+    try {
+      await togglePin(id);
+      const note = notes.find((n) => n.id === id);
+      toast.success(note?.isPinned ? "Nota anclada" : "Nota desanclada");
+    } catch (e: any) {
+      toast.error(e?.message || "Error al anclar nota");
+    }
   };
 
   const currentCategory = CATEGORIES.find((c) => c.value === activeCategory);
