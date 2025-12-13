@@ -1,5 +1,38 @@
 const BACKEND_URL = 'https://backend-nextjs-one.vercel.app';
 
+// Category mapping: frontend category name -> backend category ID
+let categoryMap: Record<string, string> = {};
+
+// Load categories from backend and create mapping
+export async function loadCategories() {
+  try {
+    const res = await fetch(`${BACKEND_URL}/api/categories`);
+    if (!res.ok) return;
+    const json = await res.json();
+    const categories = json.data || json || [];
+    
+    // Map category names to IDs
+    categoryMap = {};
+    categories.forEach((cat: any) => {
+      const name = cat.name.toLowerCase();
+      categoryMap[name] = cat.id;
+      // Also map common variations
+      if (name === 'general') categoryMap['ideas'] = cat.id;
+      if (name === 'tareas') categoryMap['tasks'] = cat.id;
+      if (name === 'reuniones') categoryMap['meetings'] = cat.id;
+      if (name === 'personal') categoryMap['personal'] = cat.id;
+      if (name === 'trabajo') categoryMap['work'] = cat.id;
+    });
+  } catch (e) {
+    console.error('Error loading categories:', e);
+  }
+}
+
+// Get categoryId from category name
+function getCategoryId(category: string): string | undefined {
+  return categoryMap[category.toLowerCase()] || categoryMap['general'] || categoryMap['ideas'];
+}
+
 // Notes API
 export async function getNotes() {
   const res = await fetch(`${BACKEND_URL}/api/notes`, {
@@ -12,7 +45,8 @@ export async function getNotes() {
 }
 
 export async function createNote(title: string, content: string, category: string) {
-  const payload = { title, content, categoryId: category };
+  const categoryId = getCategoryId(category);
+  const payload = { title, content, categoryId };
   console.log('Creating note with payload:', payload);
   const res = await fetch(`${BACKEND_URL}/api/notes`, {
     method: 'POST',
@@ -30,7 +64,8 @@ export async function createNote(title: string, content: string, category: strin
 }
 
 export async function updateNote(id: string, title: string, content: string, category: string) {
-  const payload = { title, content, categoryId: category };
+  const categoryId = getCategoryId(category);
+  const payload = { title, content, categoryId };
   console.log('Updating note with payload:', payload);
   const res = await fetch(`${BACKEND_URL}/api/notes/${id}`, {
     method: 'PUT',

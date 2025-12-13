@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { Note, NoteCategory } from "@/types/note";
-import { getNotes, createNote, updateNote as updateNoteAPI, deleteNote as deleteNoteAPI } from "@/lib/api";
+import { getNotes, createNote, updateNote as updateNoteAPI, deleteNote as deleteNoteAPI, loadCategories } from "@/lib/api";
 
 const generateId = () => Math.random().toString(36).substring(2) + Date.now().toString(36);
 
@@ -8,10 +8,14 @@ export function useNotes() {
   const [notes, setNotes] = useState<Note[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Load notes from backend
+  // Load categories and notes from backend
   useEffect(() => {
-    const loadNotes = async () => {
+    const loadData = async () => {
       try {
+        // First load categories to build the mapping
+        await loadCategories();
+        
+        // Then load notes
         const data = await getNotes();
         const notesArray = Array.isArray(data) ? data : [];
         setNotes(notesArray.map((note: any) => ({
@@ -26,7 +30,7 @@ export function useNotes() {
         setIsLoading(false);
       }
     };
-    loadNotes();
+    loadData();
   }, []);
 
   const addNote = useCallback(async (title: string, content: string, category: string = "ideas") => {
