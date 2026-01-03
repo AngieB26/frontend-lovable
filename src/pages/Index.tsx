@@ -65,9 +65,20 @@ const Index = () => {
   const handleDeleteNote = async (id: string) => {
     try {
       await deleteNote(id);
-      toast.success("Nota eliminada");
+      toast.success("Nota eliminada", {
+        description: "La nota fue eliminada correctamente.",
+      });
     } catch (e: any) {
-      toast.error(e?.message || "Error al eliminar nota");
+      // Si el error es 404, mostrar mensaje especial
+      if (e?.message?.includes("404")) {
+        toast.error("Nota no encontrada", {
+          description: "La nota ya no existe o ya fue eliminada.",
+        });
+      } else {
+        toast.error("Error al eliminar nota", {
+          description: e?.message || "Ocurrió un error inesperado al eliminar la nota.",
+        });
+      }
     }
   };
 
