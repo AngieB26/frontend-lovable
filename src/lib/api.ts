@@ -1,4 +1,4 @@
-const BACKEND_URL = 'https://backend-mind-note.vercel.app/';
+const BACKEND_URL = 'https://backend-mind-note.vercel.app';
 
 // Category mapping: frontend category name -> backend category ID
 let categoryMap: Record<string, string> = {};
